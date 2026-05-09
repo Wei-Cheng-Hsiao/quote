@@ -863,6 +863,36 @@ function app() {
     },
   };
 }
+
+(function setupPrintHide() {
+  const SELECTORS = ['nav', 'aside', '#err-banner', '#a4-preview > div:first-child'];
+  function hide() {
+    SELECTORS.forEach(sel => document.querySelectorAll(sel).forEach(el => {
+      if (el.dataset.printPrevDisplay === undefined) {
+        el.dataset.printPrevDisplay = el.style.display || '';
+      }
+      el.style.setProperty('display', 'none', 'important');
+    }));
+  }
+  function restore() {
+    SELECTORS.forEach(sel => document.querySelectorAll(sel).forEach(el => {
+      if (el.dataset.printPrevDisplay !== undefined) {
+        if (el.dataset.printPrevDisplay === '') {
+          el.style.removeProperty('display');
+        } else {
+          el.style.display = el.dataset.printPrevDisplay;
+        }
+        delete el.dataset.printPrevDisplay;
+      }
+    }));
+  }
+  window.addEventListener('beforeprint', hide);
+  window.addEventListener('afterprint', restore);
+  const mq = window.matchMedia('print');
+  const onChange = e => e.matches ? hide() : restore();
+  if (mq.addEventListener) mq.addEventListener('change', onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+})();
 </script>
 </body>
 </html>
