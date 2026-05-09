@@ -239,8 +239,11 @@
 <div x-show="page==='quote'" class="lg:flex">
 
   <!-- 左側：編輯區 -->
-  <aside class="lg:w-[420px] bg-white p-4 shadow lg:h-screen lg:overflow-y-auto print:hidden">
-    <h2 class="font-bold text-lg mb-3">編輯報價單</h2>
+  <aside class="lg:w-[420px] bg-white shadow lg:h-screen lg:flex lg:flex-col print:hidden">
+    <div class="p-4 border-b">
+      <h2 class="font-bold text-lg">編輯報價單</h2>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4">
 
     <!-- 客戶 -->
     <div class="mb-4 border-b pb-4">
@@ -309,26 +312,15 @@
 
     <!-- 已加項目 -->
     <div class="mb-4 border-b pb-4" x-show="current.lines.length > 0">
-      <label class="text-sm font-semibold text-slate-600">已加項目</label>
-      <div class="mt-1 grid gap-2">
+      <label class="text-sm font-semibold text-slate-600">已加項目（<span x-text="current.lines.length"></span>）</label>
+      <div class="mt-1 grid gap-2 max-h-48 overflow-y-auto pr-1">
         <template x-for="(line, idx) in current.lines" :key="idx">
-          <div class="bg-slate-50 border rounded-lg p-2">
-            <div class="flex items-center justify-between mb-1">
-              <input x-model="line.name" class="font-semibold text-sm bg-transparent flex-1 outline-none border-b border-transparent focus:border-slate-300" />
-              <button @click="removeLine(idx)" class="text-red-400 hover:text-red-600 text-lg ml-2 leading-none">×</button>
-            </div>
-            <div class="flex items-center gap-2 text-sm">
-              <label class="text-slate-500 shrink-0">數量</label>
-              <input type="number" x-model.number="line.qty" min="0"
-                     class="w-16 border rounded p-1 text-center" />
-              <span class="text-slate-500 shrink-0" x-text="line.unit"></span>
-              <label class="text-slate-500 shrink-0 ml-1">單價</label>
-              <input type="number" x-model.number="line.price" min="0"
-                     class="flex-1 border rounded p-1 text-right" />
-            </div>
-            <div class="text-right text-xs text-slate-400 mt-1">
-              小計 $<span x-text="(line.qty * line.price).toLocaleString()"></span>
-            </div>
+          <div class="bg-slate-50 border rounded-lg p-2 flex items-center gap-2">
+            <span class="text-sm font-medium flex-1" x-text="line.name"></span>
+            <input type="number" x-model.number="line.qty" min="0"
+                   class="w-14 border rounded p-1 text-center text-sm" />
+            <span class="text-xs text-slate-400 shrink-0" x-text="line.unit"></span>
+            <button @click="removeLine(idx)" class="text-red-400 hover:text-red-600 text-xl leading-none shrink-0">×</button>
           </div>
         </template>
       </div>
@@ -355,10 +347,12 @@
       <textarea x-model="current.note" rows="3" class="w-full border rounded p-2 mt-1"></textarea>
     </div>
 
-    <!-- 動作 -->
-    <div class="grid grid-cols-2 gap-2">
-      <button @click="saveQuote()" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded font-bold">儲存</button>
-      <button @click="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded font-bold">列印 / PDF</button>
+    </div><!-- end scroll area -->
+
+    <!-- 動作（固定底部） -->
+    <div class="p-4 border-t grid grid-cols-2 gap-2 bg-white">
+      <button @click="saveQuote()" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-bold text-lg">儲存</button>
+      <button @click="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold text-lg">列印 / PDF</button>
     </div>
   </aside>
 
