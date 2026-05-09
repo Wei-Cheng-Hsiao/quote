@@ -412,7 +412,7 @@
       </table>
 
       <!-- 移除列按鈕（螢幕版） -->
-      <div class="mt-2 print:hidden">
+      <div class="mt-1 print:hidden">
         <template x-for="(line, idx) in current.lines" :key="'rm'+idx">
           <button @click="removeLine(idx)" class="text-xs text-red-600 mr-2 underline">
             刪 <span x-text="idx+1"></span>
@@ -420,22 +420,45 @@
         </template>
       </div>
 
-      <!-- 總計 -->
-      <div class="flex justify-end mt-4">
-        <table class="text-sm" style="width: 50%;">
-          <tr><td class="text-right font-semibold">小計</td><td class="num" x-text="subtotal().toLocaleString()"></td></tr>
-          <tr x-show="current.discount"><td class="text-right font-semibold">折扣</td><td class="num" x-text="'-' + Number(current.discount||0).toLocaleString()"></td></tr>
-          <tr x-show="current.taxEnabled"><td class="text-right font-semibold">稅金 (<span x-text="current.taxRate"></span>%)</td><td class="num" x-text="taxAmount().toLocaleString()"></td></tr>
-          <tr x-show="current.deposit"><td class="text-right font-semibold">訂金</td><td class="num" x-text="'-' + Number(current.deposit||0).toLocaleString()"></td></tr>
-          <tr class="bg-slate-200"><td class="text-right font-bold text-base">應付總額</td><td class="num font-bold text-base" x-text="total().toLocaleString()"></td></tr>
-        </table>
-      </div>
+      <!-- 總計（接在表格下方，同寬同框） -->
+      <table class="text-sm mt-0">
+        <tbody>
+          <tr>
+            <td colspan="4" class="border-0"></td>
+            <td colspan="2" class="text-right font-semibold">小計</td>
+            <td class="num" x-text="subtotal().toLocaleString()"></td>
+          </tr>
+          <tr x-show="current.discount">
+            <td colspan="4" class="border-0"></td>
+            <td colspan="2" class="text-right font-semibold">折扣</td>
+            <td class="num" x-text="'-' + Number(current.discount||0).toLocaleString()"></td>
+          </tr>
+          <tr x-show="current.taxEnabled">
+            <td colspan="4" class="border-0"></td>
+            <td colspan="2" class="text-right font-semibold">稅金（<span x-text="current.taxRate"></span>%）</td>
+            <td class="num" x-text="taxAmount().toLocaleString()"></td>
+          </tr>
+          <tr x-show="current.deposit">
+            <td colspan="4" class="border-0"></td>
+            <td colspan="2" class="text-right font-semibold">訂金</td>
+            <td class="num" x-text="'-' + Number(current.deposit||0).toLocaleString()"></td>
+          </tr>
+          <tr>
+            <td colspan="4" class="border-0"></td>
+            <td colspan="2" class="text-right font-bold text-base bg-slate-200">應付總額</td>
+            <td class="num font-bold text-base bg-slate-200" x-text="total().toLocaleString()"></td>
+          </tr>
+          <!-- 備註列 -->
+          <tr x-show="current.note">
+            <td colspan="7" class="pt-2">
+              <div class="font-semibold mb-1">備註</div>
+              <div class="whitespace-pre-wrap" x-text="current.note"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-      <!-- 備註 + 簽名 -->
-      <div class="mt-6 text-sm" x-show="current.note">
-        <div class="font-semibold">備註：</div>
-        <div class="whitespace-pre-wrap" x-text="current.note"></div>
-      </div>
+      <!-- 簽名 -->
       <div class="mt-12 grid grid-cols-2 gap-8 text-sm">
         <div>甲方簽名（客戶）：__________________　日期：________</div>
         <div>乙方簽名（承攬人）：__________________　日期：________</div>
