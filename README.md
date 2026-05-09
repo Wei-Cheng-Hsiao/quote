@@ -21,7 +21,7 @@
 ### 手機測試（同 Wi-Fi）
 1. 在桌機跑簡易 server：
    ```bash
-   cd C:\Users\qazz8\Documents\my-agent\100_Todo\projects\zhanqun-quote
+   cd <repo 資料夾>
    python -m http.server 8000
    ```
 2. 查桌機區網 IP（`ipconfig` → IPv4），假設是 `192.168.1.10`
