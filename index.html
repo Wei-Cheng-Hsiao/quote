@@ -28,17 +28,24 @@
   @media print {
     nav, aside, #err-banner, #a4-preview > div:first-child { display: none !important; }
     body { background: white; margin: 0; padding: 0; }
-    main#a4-preview { padding: 0 !important; display: block !important; }
+    /* 開單頁 flex 容器改 block，讓 aside 消失後 main 佔全寬 */
+    .lg\:flex { display: block !important; }
+    main#a4-preview { padding: 0 !important; display: block !important; width: 100% !important; }
     .a4-wrap { padding: 0 !important; overflow: visible !important; height: auto !important; }
     .a4 {
-      width: 100% !important;
+      position: static !important;
+      width: 210mm !important;
       min-height: unset !important;
       height: auto !important;
       box-shadow: none !important;
-      padding: 8mm !important;
-      margin: 0 !important;
+      padding: 12mm !important;
+      margin: 0 auto !important;
     }
-    @page { size: A4 portrait; margin: 8mm; }
+    @page { size: A4 portrait; margin: 0; }
+  }
+  /* 手機縮放在列印時取消 */
+  @media print and (max-width: 1024px) {
+    .a4 { transform: none !important; }
   }
 
   @media (max-width: 1024px) {
@@ -424,7 +431,7 @@
           <!-- 品項列 -->
           <template x-for="(line, idx) in current.lines" :key="idx">
             <tr>
-              <td class="num" x-text="idx+1"></td>
+              <td class="text-center" x-text="idx+1"></td>
               <td><input x-model="line.name" class="w-full bg-transparent" /></td>
               <td><input x-model="line.spec" class="w-full bg-transparent" /></td>
               <td><input x-model="line.unit" class="w-full bg-transparent text-center" /></td>
@@ -644,16 +651,29 @@ function app() {
 
     defaultItems() {
       return [
-        { id: 'i1', name: '系統櫃', spec: '高 240cm 含五金', unit: '尺', basePrice: 0 },
-        { id: 'i2', name: '海島型木地板', spec: '含施工', unit: '坪', basePrice: 0 },
-        { id: 'i3', name: '木作天花板', spec: '矽酸鈣板含油漆', unit: '坪', basePrice: 0 },
-        { id: 'i4', name: '木作隔間', spec: '雙面矽酸鈣板', unit: '坪', basePrice: 0 },
-        { id: 'i5', name: '木作門片', spec: '含五金安裝', unit: '片', basePrice: 0 },
-        { id: 'i6', name: '玄關鞋櫃', spec: '客製尺寸', unit: '尺', basePrice: 0 },
-        { id: 'i7', name: '電視櫃', spec: '木作含貼皮', unit: '尺', basePrice: 0 },
-        { id: 'i8', name: '床頭櫃', spec: '木作含貼皮', unit: '尺', basePrice: 0 },
-        { id: 'i9', name: '舊櫃拆除', spec: '不含清運', unit: '式', basePrice: 0 },
-        { id: 'i10', name: '清運費', spec: '一車', unit: '式', basePrice: 0 }
+        { id: 'i_c1', name: '平釘天花板', spec: '輕鋼架+矽酸鈣板', unit: '坪', basePrice: 0, category: '天花板' },
+        { id: 'i_c2', name: '造型天花板', spec: '角材+矽酸鈣板', unit: '坪', basePrice: 0, category: '天花板' },
+        { id: 'i_c3', name: '曲面天花板', spec: '角材+矽酸鈣板彎弧', unit: '坪', basePrice: 0, category: '天花板' },
+        { id: 'i_c4', name: '輕鋼架天花板', spec: '明架/暗架', unit: '坪', basePrice: 0, category: '天花板' },
+        { id: 'i_c5', name: '窗簾盒', spec: '角材+矽酸鈣板', unit: '尺', basePrice: 0, category: '天花板' },
+        { id: 'i_f1', name: '直鋪木地板', spec: '防潮布打底+隔音棉', unit: '坪', basePrice: 0, category: '地板' },
+        { id: 'i_f2', name: '架高木地板', spec: '角材+四分夾板打底', unit: '坪', basePrice: 0, category: '地板' },
+        { id: 'i_f3', name: '踢腳板', spec: '實木/MDF', unit: '尺', basePrice: 0, category: '地板' },
+        { id: 'i_w1', name: '木作隔間', spec: '角材+木皮板', unit: '坪', basePrice: 0, category: '壁面' },
+        { id: 'i_w2', name: '木作包板', spec: '角材+夾板', unit: '坪', basePrice: 0, category: '壁面' },
+        { id: 'i_w3', name: '木作貼皮', spec: '角材+底板+面材', unit: '坪', basePrice: 0, category: '壁面' },
+        { id: 'i_w4', name: '木作包柱', spec: '角材+夾板', unit: '式', basePrice: 0, category: '壁面' },
+        { id: 'i_w5', name: '木作包樑', spec: '角材+夾板', unit: '式', basePrice: 0, category: '壁面' },
+        { id: 'i_w6', name: '木作門片', spec: '含五金安裝', unit: '片', basePrice: 0, category: '壁面' },
+        { id: 'i_w7', name: '窗台板', spec: '實木/木心板', unit: '尺', basePrice: 0, category: '壁面' },
+        { id: 'i_b1', name: '衣櫃', spec: '木芯板桶身', unit: '尺', basePrice: 0, category: '櫃體' },
+        { id: 'i_b2', name: '鞋櫃', spec: '木芯板桶身', unit: '尺', basePrice: 0, category: '櫃體' },
+        { id: 'i_b3', name: '電視櫃', spec: '木芯板桶身', unit: '尺', basePrice: 0, category: '櫃體' },
+        { id: 'i_b4', name: '書櫃', spec: '木芯板桶身', unit: '尺', basePrice: 0, category: '櫃體' },
+        { id: 'i_d1', name: '天花板拆除', spec: '', unit: '坪', basePrice: 0, category: '拆除清運' },
+        { id: 'i_d2', name: '地板拆除', spec: '', unit: '坪', basePrice: 0, category: '拆除清運' },
+        { id: 'i_d3', name: '隔間牆拆除', spec: '', unit: '坪', basePrice: 0, category: '拆除清運' },
+        { id: 'i_d4', name: '廢棄物清運', spec: '一車', unit: '式', basePrice: 0, category: '拆除清運' }
       ];
     },
 
