@@ -365,7 +365,11 @@
   </aside>
 
   <!-- 右側：A4 預覽 -->
-  <main class="flex-1 p-4 lg:p-8 a4-wrap">
+  <main id="a4-preview" class="flex-1 p-4 lg:p-8 a4-wrap">
+    <!-- 列印按鈕（桌機才顯示，手機隱藏） -->
+    <div class="hidden lg:flex justify-end mb-2 print:hidden">
+      <button @click="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-1.5 rounded text-sm">列印 / 存 PDF</button>
+    </div>
     <div class="a4" style="display:flex;flex-direction:column;">
 
       <!-- 標題 -->
@@ -691,6 +695,11 @@ function app() {
       else this.quotes.push(JSON.parse(JSON.stringify(this.current)));
       this.saveQuotes();
       alert('已儲存：' + this.current.no + '\n\n資料存在這支手機的瀏覽器裡。\n換手機或清除瀏覽器前，請先到首頁按「備份資料」。');
+      // 手機版儲存後捲到 A4 預覽區
+      if (window.innerWidth < 1024) {
+        const el = document.getElementById('a4-preview');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
     },
 
     loadQuote(q) {
