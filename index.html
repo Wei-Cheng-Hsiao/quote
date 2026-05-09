@@ -307,6 +307,33 @@
       </button>
     </div>
 
+    <!-- 已加項目 -->
+    <div class="mb-4 border-b pb-4" x-show="current.lines.length > 0">
+      <label class="text-sm font-semibold text-slate-600">已加項目</label>
+      <div class="mt-1 grid gap-2">
+        <template x-for="(line, idx) in current.lines" :key="idx">
+          <div class="bg-slate-50 border rounded-lg p-2">
+            <div class="flex items-center justify-between mb-1">
+              <input x-model="line.name" class="font-semibold text-sm bg-transparent flex-1 outline-none border-b border-transparent focus:border-slate-300" />
+              <button @click="removeLine(idx)" class="text-red-400 hover:text-red-600 text-lg ml-2 leading-none">×</button>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <label class="text-slate-500 shrink-0">數量</label>
+              <input type="number" x-model.number="line.qty" min="0"
+                     class="w-16 border rounded p-1 text-center" />
+              <span class="text-slate-500 shrink-0" x-text="line.unit"></span>
+              <label class="text-slate-500 shrink-0 ml-1">單價</label>
+              <input type="number" x-model.number="line.price" min="0"
+                     class="flex-1 border rounded p-1 text-right" />
+            </div>
+            <div class="text-right text-xs text-slate-400 mt-1">
+              小計 $<span x-text="(line.qty * line.price).toLocaleString()"></span>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <!-- 金額調整 -->
     <div class="mb-4 border-b pb-4">
       <label class="text-sm font-semibold text-slate-600">金額調整</label>
