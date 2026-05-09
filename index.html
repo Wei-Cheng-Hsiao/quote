@@ -26,18 +26,19 @@
   .a4 .num { text-align: right; font-variant-numeric: tabular-nums; }
 
   @media print {
-    body * { visibility: hidden; }
-    .a4, .a4 * { visibility: visible; }
+    nav, aside, #err-banner, #a4-preview > div:first-child { display: none !important; }
+    body { background: white; margin: 0; padding: 0; }
+    main#a4-preview { padding: 0 !important; display: block !important; }
+    .a4-wrap { padding: 0 !important; overflow: visible !important; height: auto !important; }
     .a4 {
-      position: absolute;
-      left: 0; top: 0;
-      width: 210mm;
-      min-height: unset;
-      height: auto;
-      box-shadow: none;
-      padding: 12mm;
+      width: 100% !important;
+      min-height: unset !important;
+      height: auto !important;
+      box-shadow: none !important;
+      padding: 8mm !important;
+      margin: 0 !important;
     }
-    @page { size: A4; margin: 10mm; }
+    @page { size: A4 portrait; margin: 8mm; }
   }
 
   @media (max-width: 1024px) {
