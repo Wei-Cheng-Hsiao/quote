@@ -261,13 +261,15 @@
     <!-- 加品項 -->
     <div class="mb-4 border-b pb-4">
       <label class="text-sm font-semibold text-slate-600">加入品項</label>
-      <input x-model="itemSearch" placeholder="搜尋品項庫..." class="w-full border rounded p-2 mt-1" />
-      <div class="max-h-48 overflow-y-auto border rounded mt-1">
+      <input x-model="itemSearch" placeholder="搜尋品項..." class="w-full border rounded p-2 mt-1" />
+
+      <!-- 搜尋結果 -->
+      <div x-show="itemSearch.trim()" class="max-h-48 overflow-y-auto border rounded mt-1">
         <template x-for="it in filteredItems()" :key="it.id">
           <div @click="addLine(it)" class="p-2 hover:bg-blue-50 cursor-pointer text-sm border-b">
             <div class="font-semibold" x-text="it.name"></div>
             <div class="text-xs text-slate-500">
-              <span x-text="it.spec"></span> · <span x-text="it.unit"></span> · 基準 $<span x-text="it.basePrice"></span>
+              <span x-text="it.spec"></span> · <span x-text="it.unit"></span>
             </div>
           </div>
         </template>
@@ -275,6 +277,31 @@
           無符合品項，<button @click="quickAddItem()" class="underline text-blue-600">建立新品項</button>
         </div>
       </div>
+
+      <!-- 分類手風琴（無搜尋時顯示） -->
+      <div x-show="!itemSearch.trim()" class="border rounded mt-1 overflow-hidden">
+        <template x-for="cat in categories" :key="cat">
+          <div>
+            <button @click="toggleCat(cat)"
+                    class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 text-sm font-semibold border-b">
+              <span x-text="catIcon(cat) + ' ' + cat"></span>
+              <span x-text="openCats.includes(cat) ? '▾' : '▸'" class="text-slate-400"></span>
+            </button>
+            <div x-show="openCats.includes(cat)">
+              <template x-for="it in itemsByCategory(cat)" :key="it.id">
+                <div @click="addLine(it)" class="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b flex items-center justify-between">
+                  <div>
+                    <span class="font-medium" x-text="it.name"></span>
+                    <span class="text-xs text-slate-400 ml-1" x-text="it.spec ? '· ' + it.spec : ''"></span>
+                  </div>
+                  <span class="text-xs text-slate-400 shrink-0 ml-2" x-text="it.unit"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
       <button @click="addBlankLine()" class="w-full mt-2 bg-slate-200 hover:bg-slate-300 rounded p-2 text-sm">
         ➕ 加一筆空白項目（手寫）
       </button>
@@ -473,6 +500,8 @@ function app() {
     itemSearch: '',
     customerSuggestions: [],
     newItem: { name: '', spec: '', unit: '尺', basePrice: 0 },
+    categories: ['天花板', '地板', '壁面', '櫃體', '拆除清運'],
+    openCats: [],
 
     init() {
       this.loadAll();
@@ -609,6 +638,20 @@ function app() {
       if (!confirm('確定刪除這張報價單？')) return;
       this.quotes = this.quotes.filter(q => q.id !== id);
       this.saveQuotes();
+    },
+
+    toggleCat(cat) {
+      const idx = this.openCats.indexOf(cat);
+      if (idx >= 0) this.openCats.splice(idx, 1);
+      else this.openCats.push(cat);
+    },
+
+    catIcon(cat) {
+      return { '天花板': '🔲', '地板': '▭', '壁面': '🪟', '櫃體': '🗄️', '拆除清運': '🪣' }[cat] || '📦';
+    },
+
+    itemsByCategory(cat) {
+      return this.items.filter(it => (it.category || '其他') === cat);
     },
 
     filteredItems() {

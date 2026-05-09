@@ -1,0 +1,29 @@
+{
+  "items": [
+    { "id": "i_c1", "name": "平釘天花板", "unit": "坪", "basePrice": 0, "spec": "輕鋼架+矽酸鈣板", "category": "天花板" },
+    { "id": "i_c2", "name": "造型天花板", "unit": "坪", "basePrice": 0, "spec": "角材+矽酸鈣板", "category": "天花板" },
+    { "id": "i_c3", "name": "曲面天花板", "unit": "坪", "basePrice": 0, "spec": "角材+矽酸鈣板彎弧", "category": "天花板" },
+    { "id": "i_c4", "name": "輕鋼架天花板", "unit": "坪", "basePrice": 0, "spec": "明架/暗架", "category": "天花板" },
+    { "id": "i_c5", "name": "窗簾盒", "unit": "尺", "basePrice": 0, "spec": "角材+矽酸鈣板", "category": "天花板" },
+    { "id": "i_f1", "name": "直鋪木地板", "unit": "坪", "basePrice": 0, "spec": "防潮布打底+隔音棉", "category": "地板" },
+    { "id": "i_f2", "name": "架高木地板", "unit": "坪", "basePrice": 0, "spec": "角材+四分夾板打底", "category": "地板" },
+    { "id": "i_f3", "name": "踢腳板", "unit": "尺", "basePrice": 0, "spec": "實木/MDF", "category": "地板" },
+    { "id": "i_w1", "name": "木作隔間", "unit": "坪", "basePrice": 0, "spec": "角材+木皮板", "category": "壁面" },
+    { "id": "i_w2", "name": "木作包板", "unit": "坪", "basePrice": 0, "spec": "角材+夾板", "category": "壁面" },
+    { "id": "i_w3", "name": "木作貼皮", "unit": "坪", "basePrice": 0, "spec": "角材+底板+面材", "category": "壁面" },
+    { "id": "i_w4", "name": "木作包柱", "unit": "式", "basePrice": 0, "spec": "角材+夾板", "category": "壁面" },
+    { "id": "i_w5", "name": "木作包樑", "unit": "式", "basePrice": 0, "spec": "角材+夾板", "category": "壁面" },
+    { "id": "i_w6", "name": "木作門片", "unit": "片", "basePrice": 0, "spec": "含五金安裝", "category": "壁面" },
+    { "id": "i_w7", "name": "窗台板", "unit": "尺", "basePrice": 0, "spec": "實木/木心板", "category": "壁面" },
+    { "id": "i_b1", "name": "衣櫃", "unit": "尺", "basePrice": 0, "spec": "木芯板桶身", "category": "櫃體" },
+    { "id": "i_b2", "name": "鞋櫃", "unit": "尺", "basePrice": 0, "spec": "木芯板桶身", "category": "櫃體" },
+    { "id": "i_b3", "name": "電視櫃", "unit": "尺", "basePrice": 0, "spec": "木芯板桶身", "category": "櫃體" },
+    { "id": "i_b4", "name": "書櫃", "unit": "尺", "basePrice": 0, "spec": "木芯板桶身", "category": "櫃體" },
+    { "id": "i_d1", "name": "天花板拆除", "unit": "坪", "basePrice": 0, "spec": "", "category": "拆除清運" },
+    { "id": "i_d2", "name": "地板拆除", "unit": "坪", "basePrice": 0, "spec": "", "category": "拆除清運" },
+    { "id": "i_d3", "name": "隔間牆拆除", "unit": "坪", "basePrice": 0, "spec": "", "category": "拆除清運" },
+    { "id": "i_d4", "name": "廢棄物清運", "unit": "式", "basePrice": 0, "spec": "一車", "category": "拆除清運" }
+  ],
+  "customers": [],
+  "quotes": []
+}
