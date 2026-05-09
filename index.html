@@ -359,9 +359,8 @@
     </div><!-- end scroll area -->
 
     <!-- 動作（固定底部） -->
-    <div class="p-4 border-t grid grid-cols-2 gap-2 bg-white">
-      <button @click="saveQuote()" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-bold text-lg">儲存</button>
-      <button @click="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold text-lg">列印 / PDF</button>
+    <div class="p-4 border-t bg-white">
+      <button @click="saveQuote()" class="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-bold text-lg">儲存報價單</button>
     </div>
   </aside>
 
@@ -691,7 +690,7 @@ function app() {
       if (idx >= 0) this.quotes[idx] = JSON.parse(JSON.stringify(this.current));
       else this.quotes.push(JSON.parse(JSON.stringify(this.current)));
       this.saveQuotes();
-      alert('已儲存：' + this.current.no);
+      alert('已儲存：' + this.current.no + '\n\n資料存在這支手機的瀏覽器裡。\n換手機或清除瀏覽器前，請先到首頁按「備份資料」。');
     },
 
     loadQuote(q) {
