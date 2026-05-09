@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>展群室內設計 — 報價單系統</title>
+<title>報價單系統</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
   body { font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
 
-  /* A4 預覽：螢幕上顯示 */
   .a4 {
     width: 210mm;
     min-height: 297mm;
@@ -26,7 +25,6 @@
   .a4 th { background: #f3f4f6; font-weight: 600; }
   .a4 .num { text-align: right; font-variant-numeric: tabular-nums; }
 
-  /* 列印模式：只印 .a4，其他全部隱藏 */
   @media print {
     body * { visibility: hidden; }
     .a4, .a4 * { visibility: visible; }
@@ -40,7 +38,6 @@
     @page { size: A4; margin: 0; }
   }
 
-  /* 手機：A4 預覽縮放可捲動 */
   @media (max-width: 1024px) {
     .a4 { transform: scale(0.5); transform-origin: top left; }
     .a4-wrap { overflow: auto; height: 60vh; }
@@ -49,6 +46,7 @@
   [x-cloak] { display: none !important; }
 </style>
 </head>
+
 <div id="err-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:white;padding:8px 12px;z-index:9999;font-size:13px;font-family:monospace;"></div>
 <script>
   window.addEventListener('error', e => {
@@ -57,11 +55,144 @@
   });
 </script>
 
-<body class="bg-slate-100 min-h-screen" x-data="app()" x-init="init()">
+<body class="bg-slate-100 min-h-screen" x-data="app()" x-init="init()" x-cloak>
+
+<!-- ========== 初次設定視窗 ========== -->
+<div x-show="showSetup" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <h2 class="text-2xl font-bold mb-1">歡迎使用報價單系統</h2>
+    <p class="text-slate-500 text-sm mb-6">請先填寫您的基本資料，只需設定一次</p>
+
+    <div class="grid gap-3">
+      <div>
+        <label class="text-sm font-semibold text-slate-600">公司／工作室名稱</label>
+        <input x-model="setupForm.company" placeholder="例：展群室內設計"
+               class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">負責人姓名</label>
+        <input x-model="setupForm.owner" placeholder="例：蕭樹德"
+               class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">手機號碼</label>
+        <input x-model="setupForm.mobile" placeholder="例：0935-779-618" type="tel"
+               class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">市話（選填）</label>
+        <input x-model="setupForm.tel" placeholder="例：04-873-6885" type="tel"
+               class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+    </div>
+
+    <button @click="saveSetup()"
+            class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl">
+      設定完成，開始使用
+    </button>
+  </div>
+</div>
+
+<!-- ========== 備份引導視窗 ========== -->
+<div x-show="showBackupGuide" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <h2 class="text-2xl font-bold mb-1">📥 備份資料到手機</h2>
+    <p class="text-slate-500 text-sm mb-6">萬一換手機或清除瀏覽器，資料不會不見</p>
+
+    <div class="grid gap-4 mb-6">
+      <div class="flex items-start gap-3">
+        <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">1</span>
+        <p class="text-base pt-1">按下面「下載備份檔」按鈕</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">2</span>
+        <p class="text-base pt-1">手機會問「要儲存嗎？」→ 按<strong>「儲存」</strong>或<strong>「下載」</strong></p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">3</span>
+        <p class="text-base pt-1">備份完成！建議每個月備份一次</p>
+      </div>
+    </div>
+
+    <button @click="exportData()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl mb-3">
+      下載備份檔
+    </button>
+    <button @click="showBackupGuide=false"
+            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-lg py-3 rounded-xl">
+      關閉
+    </button>
+  </div>
+</div>
+
+<!-- ========== 還原引導視窗 ========== -->
+<div x-show="showRestoreGuide" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <h2 class="text-2xl font-bold mb-1">📤 還原備份資料</h2>
+    <p class="text-slate-500 text-sm mb-6">把之前備份的檔案重新載入</p>
+
+    <div class="grid gap-4 mb-6">
+      <div class="flex items-start gap-3">
+        <span class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">1</span>
+        <p class="text-base pt-1">按下面「選擇備份檔」按鈕</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">2</span>
+        <p class="text-base pt-1">找到之前下載的備份檔（檔名開頭是 <strong>quote-</strong>）</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">3</span>
+        <p class="text-base pt-1">選好後按確認，資料就會恢復</p>
+      </div>
+    </div>
+
+    <label class="block w-full bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-4 rounded-xl mb-3 text-center cursor-pointer">
+      選擇備份檔
+      <input type="file" accept=".json" @change="importData($event)" class="hidden" />
+    </label>
+    <button @click="showRestoreGuide=false"
+            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-lg py-3 rounded-xl">
+      關閉
+    </button>
+  </div>
+</div>
+
+<!-- ========== 設定視窗（修改資料用）========== -->
+<div x-show="showSettingsEdit" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <h2 class="text-2xl font-bold mb-4">修改基本資料</h2>
+    <div class="grid gap-3">
+      <div>
+        <label class="text-sm font-semibold text-slate-600">公司／工作室名稱</label>
+        <input x-model="setupForm.company" class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">負責人姓名</label>
+        <input x-model="setupForm.owner" class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">手機號碼</label>
+        <input x-model="setupForm.mobile" type="tel" class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-semibold text-slate-600">市話（選填）</label>
+        <input x-model="setupForm.tel" type="tel" class="w-full border-2 rounded-lg p-3 mt-1 text-lg focus:border-blue-500 outline-none" />
+      </div>
+    </div>
+    <button @click="saveSetup()"
+            class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl mb-3">
+      儲存
+    </button>
+    <button @click="showSettingsEdit=false"
+            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-lg py-3 rounded-xl">
+      取消
+    </button>
+  </div>
+</div>
 
 <!-- ========== 頂部導航 ========== -->
 <nav class="bg-slate-800 text-white p-3 flex items-center gap-2 print:hidden">
-  <span class="font-bold mr-4">展群室內設計</span>
+  <span class="font-bold mr-4" x-text="profile.company || '報價單系統'"></span>
   <button @click="page='home'" :class="page==='home'?'bg-slate-600':'hover:bg-slate-700'" class="px-3 py-1 rounded">首頁</button>
   <button @click="page='quote'" :class="page==='quote'?'bg-slate-600':'hover:bg-slate-700'" class="px-3 py-1 rounded">開單</button>
   <button @click="page='history'" :class="page==='history'?'bg-slate-600':'hover:bg-slate-700'" class="px-3 py-1 rounded">歷史</button>
@@ -70,28 +201,37 @@
 </nav>
 
 <!-- ========== 首頁 ========== -->
-<div x-show="page==='home'" class="p-8 max-w-3xl mx-auto">
-  <h1 class="text-3xl font-bold mb-2">展群室內設計</h1>
-  <p class="text-slate-600 mb-8">蕭樹德　0935-779-618 / 04-873-6885</p>
+<div x-show="page==='home'" class="p-6 max-w-3xl mx-auto">
+  <h1 class="text-3xl font-bold mb-1" x-text="profile.company || '報價單系統'"></h1>
+  <p class="text-slate-600 mb-8" x-text="[profile.owner, profile.mobile, profile.tel].filter(Boolean).join('　')"></p>
 
   <div class="grid gap-4">
-    <button @click="newQuote()" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-xl font-bold shadow">
+    <button @click="newQuote()" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl text-xl font-bold shadow">
       ➕ 新開報價單
     </button>
-    <button @click="page='history'" class="bg-white hover:bg-slate-50 p-6 rounded-lg text-xl shadow border">
+    <button @click="page='history'" class="bg-white hover:bg-slate-50 p-6 rounded-xl text-xl shadow border">
       📋 歷史報價（<span x-text="quotes.length"></span>）
     </button>
-    <button @click="page='items'" class="bg-white hover:bg-slate-50 p-6 rounded-lg text-xl shadow border">
+    <button @click="page='items'" class="bg-white hover:bg-slate-50 p-6 rounded-xl text-xl shadow border">
       📦 品項庫管理（<span x-text="items.length"></span>）
     </button>
   </div>
 
-  <div class="mt-8 text-sm text-slate-500">
-    <button @click="exportData()" class="underline">匯出資料 JSON</button> ·
-    <label class="underline cursor-pointer">
-      匯入資料
-      <input type="file" accept=".json" @change="importData($event)" class="hidden" />
-    </label>
+  <!-- 備份 / 還原 -->
+  <div class="mt-6 grid grid-cols-2 gap-3">
+    <button @click="showBackupGuide=true"
+            class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-xl text-base font-bold shadow">
+      📥 備份資料
+    </button>
+    <button @click="showRestoreGuide=true"
+            class="bg-slate-600 hover:bg-slate-700 text-white p-4 rounded-xl text-base font-bold shadow">
+      📤 還原備份
+    </button>
+  </div>
+
+  <!-- 修改基本資料 -->
+  <div class="mt-4 text-center">
+    <button @click="openSettingsEdit()" class="text-sm text-slate-400 underline">修改公司資料</button>
   </div>
 </div>
 
@@ -174,9 +314,9 @@
       <!-- 抬頭 -->
       <div class="flex items-start justify-between border-b-2 border-slate-800 pb-3 mb-4">
         <div>
-          <h1 class="text-2xl font-bold">展群室內設計</h1>
-          <div class="text-sm mt-1">蕭樹德</div>
-          <div class="text-sm">0935-779-618 / 04-873-6885</div>
+          <h1 class="text-2xl font-bold" x-text="profile.company || '　'"></h1>
+          <div class="text-sm mt-1" x-text="profile.owner || '　'"></div>
+          <div class="text-sm" x-text="[profile.mobile, profile.tel].filter(Boolean).join(' / ') || '　'"></div>
         </div>
         <div class="text-right">
           <h2 class="text-3xl font-bold">報　價　單</h2>
@@ -217,7 +357,6 @@
               <td class="num" x-text="(line.qty * line.price).toLocaleString()"></td>
             </tr>
           </template>
-          <!-- 補空白列讓表格美觀（最少 8 列） -->
           <template x-for="i in Math.max(0, 8 - current.lines.length)" :key="'empty'+i">
             <tr><td class="num">　</td><td>　</td><td></td><td></td><td></td><td></td><td></td></tr>
           </template>
@@ -312,13 +451,18 @@ function app() {
   return {
     page: 'home',
     autoSaveText: '',
+    showSetup: false,
+    showBackupGuide: false,
+    showRestoreGuide: false,
+    showSettingsEdit: false,
 
-    // 資料層
+    profile: { company: '', owner: '', mobile: '', tel: '' },
+    setupForm: { company: '', owner: '', mobile: '', tel: '' },
+
     items: [],
     customers: [],
     quotes: [],
 
-    // 當前編輯的報價單（init 後才填）
     current: {
       id: '', no: '', date: '',
       customer: { name: '', phone: '', site: '' },
@@ -326,20 +470,40 @@ function app() {
       taxEnabled: false, taxRate: 5, note: ''
     },
 
-    // UI 狀態
     itemSearch: '',
     customerSuggestions: [],
     newItem: { name: '', spec: '', unit: '尺', basePrice: 0 },
 
-    // ===== 初始化 =====
     init() {
       this.loadAll();
-      // 第一次使用，預填常用木作品項
       if (this.items.length === 0) {
         this.items = this.defaultItems();
         this.saveItems();
       }
       this.current = this.blankQuote();
+
+      const saved = localStorage.getItem('zq_profile');
+      if (saved) {
+        this.profile = JSON.parse(saved);
+      } else {
+        this.showSetup = true;
+      }
+    },
+
+    saveSetup() {
+      if (!this.setupForm.company || !this.setupForm.owner || !this.setupForm.mobile) {
+        alert('請填寫公司名稱、姓名和手機號碼');
+        return;
+      }
+      this.profile = { ...this.setupForm };
+      localStorage.setItem('zq_profile', JSON.stringify(this.profile));
+      this.showSetup = false;
+      this.showSettingsEdit = false;
+    },
+
+    openSettingsEdit() {
+      this.setupForm = { ...this.profile };
+      this.showSettingsEdit = true;
     },
 
     blankQuote() {
@@ -384,7 +548,6 @@ function app() {
       ];
     },
 
-    // ===== 儲存/讀取 =====
     loadAll() {
       this.items = JSON.parse(localStorage.getItem('zq_items') || '[]');
       this.customers = JSON.parse(localStorage.getItem('zq_customers') || '[]');
@@ -406,14 +569,12 @@ function app() {
       setTimeout(() => this.autoSaveText = '', 2000);
     },
 
-    // ===== 開單操作 =====
     newQuote() {
       this.current = this.blankQuote();
       this.page = 'quote';
     },
 
     saveQuote() {
-      // 客戶自動累積
       if (this.current.customer.name) {
         const exists = this.customers.find(c =>
           c.name === this.current.customer.name && c.phone === this.current.customer.phone
@@ -423,7 +584,6 @@ function app() {
           this.saveCustomers();
         }
       }
-      // 報價單覆寫或新增
       const idx = this.quotes.findIndex(q => q.id === this.current.id);
       if (idx >= 0) this.quotes[idx] = JSON.parse(JSON.stringify(this.current));
       else this.quotes.push(JSON.parse(JSON.stringify(this.current)));
@@ -451,7 +611,6 @@ function app() {
       this.saveQuotes();
     },
 
-    // ===== 品項加入 =====
     filteredItems() {
       const kw = this.itemSearch.trim();
       if (!kw) return this.items.slice(0, 50);
@@ -461,13 +620,7 @@ function app() {
     },
 
     addLine(it) {
-      this.current.lines.push({
-        name: it.name,
-        spec: it.spec,
-        unit: it.unit,
-        qty: 1,
-        price: it.basePrice
-      });
+      this.current.lines.push({ name: it.name, spec: it.spec, unit: it.unit, qty: 1, price: it.basePrice });
     },
 
     addBlankLine() {
@@ -488,13 +641,10 @@ function app() {
       this.itemSearch = '';
     },
 
-    // ===== 客戶搜尋 =====
     searchCustomer() {
       const kw = this.current.customer.name.trim();
       if (!kw) { this.customerSuggestions = []; return; }
-      this.customerSuggestions = this.customers.filter(c =>
-        c.name.includes(kw)
-      ).slice(0, 5);
+      this.customerSuggestions = this.customers.filter(c => c.name.includes(kw)).slice(0, 5);
     },
 
     pickCustomer(c) {
@@ -502,7 +652,6 @@ function app() {
       this.customerSuggestions = [];
     },
 
-    // ===== 品項庫管理 =====
     addItem() {
       if (!this.newItem.name) { alert('請輸入品項名稱'); return; }
       this.items.push({ id: 'i_'+Date.now(), ...this.newItem });
@@ -516,7 +665,6 @@ function app() {
       this.saveItems();
     },
 
-    // ===== 計算 =====
     subtotal() {
       return this.current.lines.reduce((s, l) => s + (Number(l.qty)||0) * (Number(l.price)||0), 0);
     },
@@ -534,16 +682,16 @@ function app() {
       return sub - (Number(q.discount)||0) + tax - (Number(q.deposit)||0);
     },
 
-    // ===== 匯出/匯入 =====
     exportData() {
       const data = { items: this.items, customers: this.customers, quotes: this.quotes };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'zhanqun-quote-' + this.today() + '.json';
+      a.download = 'quote-' + this.today() + '.json';
       a.click();
       URL.revokeObjectURL(url);
+      this.showBackupGuide = false;
     },
 
     importData(ev) {
@@ -553,19 +701,17 @@ function app() {
       r.onload = e => {
         try {
           const data = JSON.parse(e.target.result);
-          if (!confirm('確定覆蓋目前資料？')) return;
+          if (!confirm('確定用備份檔覆蓋目前資料？')) return;
           this.items = data.items || [];
           this.customers = data.customers || [];
           this.quotes = data.quotes || [];
           this.saveItems(); this.saveCustomers(); this.saveQuotes();
-          alert('匯入完成');
-        } catch (e) { alert('匯入失敗：' + e.message); }
+          this.showRestoreGuide = false;
+          alert('還原完成！');
+        } catch (e) { alert('還原失敗，請確認檔案正確'); }
       };
       r.readAsText(file);
     },
-
-    // 自動儲存當前編輯（每 30 秒）
-    // 註：此 POC 採手動儲存按鈕，避免 localStorage 寫入過多
   };
 }
 </script>
