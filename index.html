@@ -367,49 +367,55 @@
 
   <!-- 右側：A4 預覽 -->
   <main class="flex-1 p-4 lg:p-8 a4-wrap">
-    <div class="a4">
+    <div class="a4" style="display:flex;flex-direction:column;">
 
       <!-- 標題 -->
       <div class="text-center text-xl font-bold mb-2" x-text="profile.company ? profile.company + '　工程報價單' : '工程報價單'"></div>
 
-      <!-- 抬頭表格 -->
-      <table class="text-sm mb-0">
+      <!-- 主表格（抬頭 + 品項 + 總額 + 備詳 共用同一 colgroup） -->
+      <table class="text-sm" style="flex:1;">
+        <colgroup>
+          <col style="width:28px" />   <!-- # -->
+          <col />                       <!-- 品項（彈性） -->
+          <col style="width:95px" />   <!-- 規格 -->
+          <col style="width:38px" />   <!-- 單位 -->
+          <col style="width:42px" />   <!-- 數量 -->
+          <col style="width:62px" />   <!-- 單價 -->
+          <col style="width:80px" />   <!-- 小計 -->
+        </colgroup>
         <tbody>
+          <!-- 抬頭：專案名稱 / 日期 -->
           <tr>
-            <td class="font-semibold w-20 bg-slate-50">專案名稱</td>
-            <td x-text="current.customer.site || '　'"></td>
-            <td class="font-semibold w-12 bg-slate-50">日期</td>
-            <td class="w-28" x-text="current.date"></td>
+            <td class="font-semibold bg-slate-50" colspan="1" style="white-space:nowrap;width:5em;">專案名稱</td>
+            <td colspan="4" x-text="current.customer.site || '　'"></td>
+            <td class="font-semibold bg-slate-50 text-center" style="white-space:nowrap;width:4em;">日期</td>
+            <td style="white-space:nowrap;" x-text="current.date"></td>
           </tr>
+          <!-- 抬頭：客戶姓名 / 聯絡電話 -->
           <tr>
-            <td class="font-semibold bg-slate-50">客戶姓名</td>
-            <td x-text="current.customer.name || '　'"></td>
-            <td class="font-semibold bg-slate-50">聯絡電話</td>
-            <td x-text="current.customer.phone || '　'"></td>
+            <td class="font-semibold bg-slate-50" style="white-space:nowrap;">客戶姓名</td>
+            <td colspan="4" x-text="current.customer.name || '　'"></td>
+            <td class="font-semibold bg-slate-50 text-center" style="white-space:nowrap;">聯絡電話</td>
+            <td style="white-space:nowrap;" x-text="current.customer.phone || '　'"></td>
           </tr>
+          <!-- 抬頭：承攬人 / 單號 -->
           <tr>
-            <td class="font-semibold bg-slate-50">承攬人</td>
-            <td x-text="[profile.owner, profile.mobile, profile.tel].filter(Boolean).join('　') || '　'"></td>
-            <td class="font-semibold bg-slate-50">單號</td>
-            <td x-text="current.no"></td>
+            <td class="font-semibold bg-slate-50" style="white-space:nowrap;">承攬人</td>
+            <td colspan="4" x-text="[profile.owner, profile.mobile, profile.tel].filter(Boolean).join('　') || '　'"></td>
+            <td class="font-semibold bg-slate-50 text-center" style="white-space:nowrap;">單號</td>
+            <td style="white-space:nowrap;" x-text="current.no"></td>
           </tr>
-        </tbody>
-      </table>
-
-      <!-- 品項表 -->
-      <table class="text-sm mt-0">
-        <thead>
+          <!-- 品項表頭 -->
           <tr>
-            <th class="w-8">#</th>
+            <th class="text-center">#</th>
             <th>品項</th>
-            <th class="w-32">規格 / 說明</th>
-            <th class="w-12">單位</th>
-            <th class="w-14">數量</th>
-            <th class="w-20">單價</th>
-            <th class="w-24">小計</th>
+            <th>規格 / 說明</th>
+            <th class="text-center" style="white-space:nowrap;">單位</th>
+            <th class="text-center" style="white-space:nowrap;">數量</th>
+            <th class="text-center" style="white-space:nowrap;">單價</th>
+            <th class="text-center" style="white-space:nowrap;">小計</th>
           </tr>
-        </thead>
-        <tbody>
+          <!-- 品項列 -->
           <template x-for="(line, idx) in current.lines" :key="idx">
             <tr>
               <td class="num" x-text="idx+1"></td>
@@ -421,9 +427,16 @@
               <td class="num" x-text="(line.qty * line.price).toLocaleString()"></td>
             </tr>
           </template>
+          <!-- 空白列補足（最少顯示 8 列） -->
           <template x-for="i in Math.max(0, 8 - current.lines.length)" :key="'empty'+i">
-            <tr><td>　</td><td>　</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>　</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           </template>
+          <!-- 超過 12 筆提示 -->
+          <tr x-show="current.lines.length > 12">
+            <td colspan="7" class="text-center text-slate-400 text-sm py-1" style="border-style:dashed;">
+              ── 內容未完，請見下頁 ──
+            </td>
+          </tr>
           <!-- 小計 -->
           <tr>
             <td colspan="5" class="border-0 bg-white"></td>
@@ -450,29 +463,25 @@
             <td class="text-right font-bold bg-slate-200">應付總額</td>
             <td class="num font-bold bg-slate-200" x-text="total().toLocaleString()"></td>
           </tr>
-          <!-- 備詳事項 -->
+          <!-- 備詳事項（有內容才顯示） -->
           <tr x-show="current.notes && current.notes.filter(n=>n).length > 0">
-            <td colspan="7" class="pt-1">
-              <div class="font-semibold mb-1">備詳事項</div>
+            <td class="font-semibold bg-slate-50 align-top" style="white-space:nowrap;width:5em;">備詳事項</td>
+            <td colspan="6">
               <template x-for="(note, idx) in current.notes.filter(n=>n)" :key="idx">
                 <div class="text-sm" x-text="(idx+1) + '、' + note"></div>
               </template>
             </td>
           </tr>
+          <!-- 備詳空格（沒有內容時留一行） -->
+          <tr x-show="!current.notes || current.notes.filter(n=>n).length === 0">
+            <td class="font-semibold bg-slate-50" style="white-space:nowrap;width:5em;">備詳事項</td>
+            <td colspan="6">　</td>
+          </tr>
         </tbody>
       </table>
 
-      <!-- 移除列按鈕（螢幕版） -->
-      <div class="mt-1 print:hidden">
-        <template x-for="(line, idx) in current.lines" :key="'rm'+idx">
-          <button @click="removeLine(idx)" class="text-xs text-red-600 mr-2 underline">
-            刪 <span x-text="idx+1"></span>
-          </button>
-        </template>
-      </div>
-
-      <!-- 簽名 -->
-      <div class="mt-10 grid grid-cols-2 gap-8 text-sm">
+      <!-- 簽名（固定在內容最底部，列印時跟著最後一頁） -->
+      <div class="mt-8 grid grid-cols-2 gap-8 text-sm">
         <div>甲方簽名（客戶）：__________________　日期：________</div>
         <div>乙方簽名（承攬人）：__________________　日期：________</div>
       </div>
